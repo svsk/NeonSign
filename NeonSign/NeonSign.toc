@@ -1,7 +1,7 @@
 ## Interface: 70100
 ## Title: NeonSign
 ## Author: Veinlash @ Karazhan-EU
-## Version: 70100
+## Version: 70101
 ## SavedVariables: NeonOptions
 
 NeonSign.lua

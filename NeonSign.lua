@@ -1,75 +1,28 @@
 -- Globals --
-RunInterval = 600.0;
-TimeSinceLast = 600.0;
-RecruitmentMessage = "<Neon> (EN 4/7M, ToV 2/3H) are looking for healers and DPS to bolster our main raiding team. We raid Mon/Thu/Sun 20:00-23:00. For more information or to apply /w me or head over to www.neon-guild.com";
+TimeSinceLast = 0;
 PlayerName = GetUnitName("player") .. "-" .. GetRealmName();
 SLASH_NEONSIGN1 = '/neon'; 
 IsGuildGroup = nil;
+DefaultSettings = {
+	["ChannelId"] = 2,
+	["ChannelName"] = "Trade",
+	["RunInterval"] = 600.0,
+	["RecruitmentEnabled"] = true,
+	["RecruitmentMessage"] = "<Neon> are looking for new members to bolster our main raiding team. We raid Mon/Thu/Sun 20:00-23:00. For more information or to apply /w me or head over to www.neon-guild.com",
+	["ShowDebugMessages"] = false
+}
 
-ChannelId = 2;
-ChannelName = "Trade - City";
--- ChannelId = 1;
--- ChannelName = "General - Blackrock Foundry";
--- ChannelId = 3;
--- ChannelName = "NeonHealers";
-
-RecruitmentEnabled = true;
-ShowMessages = false;
-
-function SlashCmdList.NEONSIGN(msg, editbox)
-	cmdList = splitString(msg);	
-
-	if (cmdList[0] == "interval") then
-		if (cmdList[1] ~= nil and tonumber(cmdList[1]) ~= nil) then
-			RunInterval = tonumber(cmdList[1]);
+function InitializeNeonSign()
+	if NeonOptions == nil then
+		TellUser("Didn't find settings. Setting them up...", true);
+		NeonOptions = {};
+	end
+	
+	for key, value in pairs(DefaultSettings) do
+		if (NeonOptions[key] == nil) then
+			NeonOptions[key] = value;
 		end
-	
-		TellUser("The current interval is " .. RunInterval .. " seconds.", true);
-		TellUser("A new message will be sent in " .. math.floor(RunInterval - TimeSinceLast) .. " seconds.", true);
-		
-		return;
 	end
-	
-	if (cmdList[0] == "enable") then
-		TimeSinceLast = 0;
-		RecruitmentEnabled = true;
-		TellUser("Addon enabled. Will send recruitment message in " .. RunInterval .. " seconds.", true);
-		
-		return;
-	end
-	
-	if (cmdList[0] == "disable") then
-		RecruitmentEnabled = false;
-		TellUser("Addon disabled.", true);
-		
-		return;
-	end
-	
-	if (cmdList[0] == "sendnow") then 
-		preState = RecruitmentEnabled;
-		RecruitmentEnabled = true;
-		SendMessageToChat(RecruitmentMessage);
-		TimeSinceLast = 0;
-		RecruitmentEnabled = preState;
-		
-		return;
-	end
-	
-	if (cmdList[0] == "isguildgroup") then
-		if (IsGuildGroup ~= nil) then
-			TellUser("IsGuildGroup = " .. tostring(IsGuildGroup) .. " (Debug)", true);
-		else
-			TellUser("IsGuildGroup = nil (Debug)", true);
-		end
-		
-		return;
-	end
-	
-	if (cmdList[0] == "channel") then
-		return;
-	end
-	
-	displayHelp();
 end
 
 function displayHelp() 
@@ -79,8 +32,8 @@ function displayHelp()
 	print("/neon sendnow - Sends the recruitment message instantly. Resets the interval.");
 	print("/neon interval - Displays the current message sending interval and time remaining until next message.");
 	print("/neon interval <seconds> - Changes the message sending interval to the specified number of seconds.");
-	print("");
-	print("|cffff0000WARNING|r Any changes to make using these commands are NOT retained upon reloading the UI.")
+	print("/neon m <recruitment message> - Changes the recruitment message sent every interval.");
+	print("/neon channel <channel number> - Changes the target recruitment channel to the channel number given.");
 end
 
 function splitString(srcString)
@@ -98,41 +51,35 @@ end
 function TellUser(message, override)
 	override = override or false;
 
-	if (override or ShowMessages) then
+	if (override or NeonOptions["ShowDebugMessages"]) then
 		prefix = "|cff86e7f0[NeonSign]|r ";
 		print(prefix .. message);
 	end
 end
 
 function SendMessageToChat(message)
-	if (RecruitmentEnabled == false) then
+	if (NeonOptions["RecruitmentEnabled"] == false) then
 		return;
 	end
 	
-	id, name = GetChannelName(ChannelId);
-	if (id > 0 and name == ChannelName) then
+	id, name = GetChannelName(NeonOptions["ChannelId"]);
+	if (id > 0 and name == NeonOptions["ChannelName"]) then
 		SendChatMessage(message, "CHANNEL", nil, id);
 	else
-		TellUser("Unable to find Trade Chat. Message not sent.");
+		TellUser("Unable to find target chat channel. Message not sent.", true);
 	end
 end
-
--- Locals --
-local NeonSignFrame = CreateFrame("FRAME", "NeonSignFrame");
-local NeonSignDupeListener = CreateFrame("FRAME", "NeonSignDupeListener");
-local NeonSignBoEListener = CreateFrame("FRAME", "NeonSignBoEListener");
-local NeonSignGroupTypeListener = CreateFrame("FRAME", NeonSignGroupTypeListener);
 
 local function NeonSignOnUpdate(self, elapsed, ...)
 	TimeSinceLast = TimeSinceLast + elapsed;
 	
-	if (TimeSinceLast > RunInterval) then 
+	if (TimeSinceLast > NeonOptions["RunInterval"]) then 
 		TimeSinceLast = 0 - math.random(1, 20);
-		SendMessageToChat(RecruitmentMessage);
+		SendMessageToChat(NeonOptions["RecruitmentMessage"]);
 	end
 end
 
-local function NeonSignOnChatMessageReceived(self, event, message, sender, language, channel, ...)
+local function NeonSignOnChatMessageReceived(self, event, message, sender, language, channel)
 	msg = message:lower();
 	
 	if (msg:match("neon") and msg:match("guild") and msg:match("com")) then		
@@ -145,7 +92,7 @@ local function NeonSignOnChatMessageReceived(self, event, message, sender, langu
 	end
 end
 
-local function NeonSignItemLooted(self, event, message, sender, language, channel, target, ...)
+local function NeonSignItemLooted(self, event, message, sender, language, channel, target)
 	if (GetZoneText() == "Hellfire Citadel" and IsGuildGroup) then
 		--Hellfire BoEs
 		boes = { 
@@ -176,11 +123,102 @@ local function NeonSignGroupStateChanged(self, event, isGuildGroup)
 	IsGuildGroup = isGuildGroup;
 end
 
+function HandleEvent(self, event, arg1, arg2, arg3, arg4, arg5, ...)
+	if event == "ADDON_LOADED" and arg1 == "NeonSign" then 
+		InitializeNeonSign();
+	elseif event == "CHAT_MSG_CHANNEL" then
+		NeonSignOnChatMessageReceived(self, event, arg1, arg2, arg3, arg4);
+	elseif event == "CHAT_MSG_LOOT" then
+		NeonSignItemLooted(self, event, arg1, arg2, arg3, arg4, arg5);
+	elseif event == "GUILD_PARTY_STATE_UPDATED" then
+		NeonSignGroupStateChanged(self, event, arg1);
+	end
+end
+
+-- Frames --
+local NeonSignFrame = CreateFrame("FRAME", "NeonSignFrame");
+local NeonSignEventListener = CreateFrame("FRAME", "NeonSignEventListener");
+
 -- Set up event handlers
+NeonSignEventListener:SetScript("OnEvent", HandleEvent);
+NeonSignEventListener:RegisterEvent("ADDON_LOADED");
+NeonSignEventListener:RegisterEvent("CHAT_MSG_CHANNEL");
+NeonSignEventListener:RegisterEvent("CHAT_MSG_LOOT");
+NeonSignEventListener:RegisterEvent("GUILD_PARTY_STATE_UPDATED");
 NeonSignFrame:SetScript("OnUpdate", NeonSignOnUpdate);
-NeonSignDupeListener:RegisterEvent("CHAT_MSG_CHANNEL");
-NeonSignDupeListener:SetScript("OnEvent", NeonSignOnChatMessageReceived);
-NeonSignBoEListener:RegisterEvent("CHAT_MSG_LOOT");
-NeonSignBoEListener:SetScript("OnEvent", NeonSignItemLooted);
-NeonSignGroupTypeListener:RegisterEvent("GUILD_PARTY_STATE_UPDATED");
-NeonSignGroupTypeListener:SetScript("OnEvent", NeonSignGroupStateChanged);
+
+
+-- Slash command stuff --
+function SlashCmdList.NEONSIGN(msg, editbox)
+	cmdList = splitString(msg);	
+
+	if (cmdList[0] == "interval") then
+		if (cmdList[1] ~= nil and tonumber(cmdList[1]) ~= nil) then
+			NeonOptions["RunInterval"] = tonumber(cmdList[1]);
+		end
+	
+		TellUser("The current interval is " .. NeonOptions["RunInterval"] .. " seconds.", true);
+		TellUser("A new message will be sent in " .. math.floor(NeonOptions["RunInterval"] - TimeSinceLast) .. " seconds.", true);
+		
+		return;
+	end
+	
+	if (cmdList[0] == "enable") then
+		TimeSinceLast = 0;
+		NeonOptions["RecruitmentEnabled"] = true;
+		TellUser("Addon enabled. Will send recruitment message in " .. NeonOptions["RunInterval"] .. " seconds.", true);
+		
+		return;
+	end
+	
+	if (cmdList[0] == "disable") then
+		NeonOptions["RecruitmentEnabled"] = false;
+		TellUser("Addon disabled.", true);
+		
+		return;
+	end
+	
+	if (cmdList[0] == "sendnow") then 
+		preState = NeonOptions["RecruitmentEnabled"];
+		NeonOptions["RecruitmentEnabled"] = true;
+		SendMessageToChat(NeonOptions["RecruitmentMessage"]);
+		TimeSinceLast = 0;
+		NeonOptions["RecruitmentEnabled"] = preState;
+		
+		return;
+	end
+	
+	if (cmdList[0] == "isguildgroup") then
+		if (IsGuildGroup ~= nil) then
+			TellUser("IsGuildGroup = " .. tostring(IsGuildGroup) .. " (Debug)", true);
+		else
+			TellUser("IsGuildGroup = nil (Debug)", true);
+		end
+		
+		return;
+	end
+	
+	if (cmdList[0] == "channel") then
+		id, name = GetChannelName(tonumber(cmdList[1]));
+		NeonOptions["ChannelId"] = id;
+		NeonOptions["ChannelName"] = name;
+		
+		TellUser("Target recruitment channel is now " .. tostring(id) .. " - " .. name, true);
+		return;
+	end
+	
+	if (cmdList[0] == "debug") then
+		NeonOptions["ShowDebugMessages"] = not NeonOptions["ShowDebugMessages"];
+		TellUser("Debug mode: " .. tostring(NeonOptions["ShowDebugMessages"]), true);
+		return;
+	end
+	
+	if (cmdList[0] == "m") then
+		local message = msg:gsub("^m ", "");
+		NeonOptions["RecruitmentMessage"] = message;
+		TellUser("Recruitment message updated!", true);
+		return;
+	end
+	
+	displayHelp();
+end

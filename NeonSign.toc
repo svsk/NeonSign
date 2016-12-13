@@ -2,5 +2,6 @@
 ## Title: NeonSign
 ## Author: Veinlash @ Karazhan-EU
 ## Version: 70100
+## SavedVariables: NeonOptions
 
 NeonSign.lua

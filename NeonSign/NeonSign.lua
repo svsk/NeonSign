@@ -93,7 +93,29 @@ local function NeonSignOnChatMessageReceived(self, event, message, sender, langu
 end
 
 local function NeonSignItemLooted(self, event, message, sender, language, channel, target)
-	if (GetZoneText() == "Hellfire Citadel" and IsGuildGroup) then
+	if (IsGuildGroup == false) then
+		return;
+	end
+
+	zone = GetZoneText();
+	boeLooted = "None";
+	boes = {};
+	
+	if (zone == "The Nighthold") then 
+		--Nighthold BoEs
+		boes = {
+			"Aristocrat's Winter Drape",
+			"Feathermane Feather Cloak",
+			"Cloak of Multitudinous Sheaths",
+			"Fashionable Autumn Cloak",
+			"Mana-Cord of Deception",
+			"Waistclasp of Unethical Power",
+			"Vintage Duskwatch Cinch",
+			"Gleaming Celestial Waistguard"
+		};
+	end
+
+	if (zone == "Hellfire Citadel") then
 		--Hellfire BoEs
 		boes = { 
 			"Unhallowed Voidlink Boots", 
@@ -105,17 +127,16 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 			"Dessicated Soulrender Slippers",
 			"Jungle Assassin's Footpads"
 		};
-		
-		boeLooted = "None";
-		for i, boe in ipairs(boes) do
-			if string.match(message, boe) then
-				boeLooted = boe;
-			end
+	end	
+	
+	for i, boe in ipairs(boes) do
+		if string.match(message, boe) then
+			boeLooted = boe;
 		end
-		
-		if (boeLooted ~= "None") then
-			SendChatMessage("[NeonSign] " .. target .. " looted a BoE item: " .. boeLooted .. ". Please trade it to Sup, Pixil, Chamdor, Spiwits or Veinlash." , "RAID_WARNING", nil, nil);
-		end		
+	end
+	
+	if (boeLooted ~= "None") then
+		SendChatMessage("[NeonSign] " .. target .. " looted a BoE item: " .. boeLooted .. ". Please trade it to Sup, Kcugi, Pix, Chamdor, Spiwits, or Veinlash." , "RAID_WARNING", nil, nil);
 	end	
 end
 

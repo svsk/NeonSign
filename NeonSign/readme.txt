@@ -1,3 +1,5 @@
+The following no longer applies, but I can't be arsed to write a better readme...
+
 http://media.sverr.es/2015-04-02_1350.png
 
 The image in the link has three arrows.

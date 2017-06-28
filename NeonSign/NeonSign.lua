@@ -100,7 +100,21 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 	zone = GetZoneText();
 	boeLooted = "None";
 	boes = {};
-	
+
+	if (zone == "Hellfire Citadel") then
+		--Hellfire BoEs
+		boes = { 
+			"Unhallowed Voidlink Boots", 
+			"Girdle of Demonic Wrath", 
+			"Cruel Hope Crushers", 
+			"Cord of Unhinged Malice", 
+			"Cursed Demonchain Belt", 
+			"Flayed Demonskin Belt", 
+			"Dessicated Soulrender Slippers",
+			"Jungle Assassin's Footpads"
+		};
+	end
+
 	if (zone == "The Nighthold") then 
 		--Nighthold BoEs
 		boes = {
@@ -115,19 +129,23 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 		};
 	end
 
-	if (zone == "Hellfire Citadel") then
-		--Hellfire BoEs
-		boes = { 
-			"Unhallowed Voidlink Boots", 
-			"Girdle of Demonic Wrath", 
-			"Cruel Hope Crushers", 
-			"Cord of Unhinged Malice", 
-			"Cursed Demonchain Belt", 
-			"Flayed Demonskin Belt", 
-			"Dessicated Soulrender Slippers",
-			"Jungle Assassin's Footpads"
+	if (zone == "Tomb of Sargeras") then
+		--Tomb of Sargeras BoEs
+		boes = {
+			"Spiked Terrorwake Greatboots",
+			"Fel-Flecked Grips",
+			"Soul-Rattle Ribcage",
+			"Diadem of the Highborne",
+			"Acolyte's Abandoned Footwraps",
+			"Sash of the Unredeemed",
+			"Treads of Violent Intrusion",
+			"Cord of Pilfered Rosaries",
+			"Treads of Panicked Escape",
+			"Pristine Moon-Wrought Clasp",
+			"Wakening Horror Spaulders",
+			"Girdle of the Crumbling Sanctum"
 		};
-	end	
+	end
 	
 	for i, boe in ipairs(boes) do
 		if string.match(message, boe) then

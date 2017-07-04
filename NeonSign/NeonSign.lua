@@ -48,6 +48,26 @@ function splitString(srcString)
 	return words;
 end
 
+function escapeLuaPattern(srcString)
+	local matches =
+	{
+		["^"] = "%^";
+		["$"] = "%$";
+		["("] = "%(";
+		[")"] = "%)";
+		["%"] = "%%";
+		["."] = "%.";
+		["["] = "%[";
+		["]"] = "%]";
+		["*"] = "%*";
+		["+"] = "%+";
+		["-"] = "%-";
+		["?"] = "%?";
+	}
+
+	return (srcString:gsub(".", matches))
+end
+
 function TellUser(message, override)
 	override = override or false;
 
@@ -148,18 +168,37 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 	end
 	
 	for i, boe in ipairs(boes) do
-		if string.match(message, boe) then
+		if string.match(message, escapeLuaPattern(boe)) then
 			boeLooted = boe;
 		end
 	end
 	
+	channel = "RAID_WARNING";
+
+	local officers = GetOfficers();
 	if (boeLooted ~= "None") then
-		SendChatMessage("[NeonSign] " .. target .. " looted a BoE item: " .. boeLooted .. ". Please trade it to Sup, Kcugi, Pix, Chamdor, Spiwits, or Veinlash." , "RAID_WARNING", nil, nil);
+		SendChatMessage("[NeonSign] " .. target .. " looted a BoE item: " .. boeLooted .. ". Please trade it to an officer (".. table.concat(officers, ", ") ..")." , channel, nil, nil);
 	end	
 end
 
 local function NeonSignGroupStateChanged(self, event, isGuildGroup)
 	IsGuildGroup = isGuildGroup;
+end
+
+function GetOfficers()
+	local officers = {};
+	local memberNum = GetNumGuildMembers();
+
+	for i = 1, memberNum do
+		local fullName, rank, rankIndex = GetGuildRosterInfo(i);
+
+		if (rank == "Officer" or rank == "Guild Leader") then
+			noRealmName = fullName:match("([^,]+)-([^,]+)");
+			table.insert(officers, noRealmName);
+		end
+	end
+
+	return officers;
 end
 
 function HandleEvent(self, event, arg1, arg2, arg3, arg4, arg5, ...)
@@ -170,7 +209,7 @@ function HandleEvent(self, event, arg1, arg2, arg3, arg4, arg5, ...)
 	elseif event == "CHAT_MSG_LOOT" then
 		NeonSignItemLooted(self, event, arg1, arg2, arg3, arg4, arg5);
 	elseif event == "GUILD_PARTY_STATE_UPDATED" then
-		NeonSignGroupStateChanged(self, event, arg1);
+		NeonSignGroupStateChanged(self, event, arg1);		
 	end
 end
 

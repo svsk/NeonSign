@@ -1,32 +1,18 @@
+local addonName, NeonSign = ...
+
 -- Globals --
 TimeSinceLast = 0;
 PlayerName = GetUnitName("player") .. "-" .. GetRealmName();
 SLASH_NEONSIGN1 = '/neon'; 
 IsGuildGroup = nil;
-DefaultSettings = {
-	["ChannelId"] = 2,
-	["ChannelName"] = "Trade",
-	["RunInterval"] = 600.0,
-	["RecruitmentEnabled"] = true,
-	["RecruitmentMessage"] = "<Neon> are looking for new members to bolster our main raiding team. We raid Mon/Thu/Sun 20:00-23:00. For more information or to apply /w me or head over to www.neon-guild.com",
-	["ShowDebugMessages"] = false
-}
 
 function InitializeNeonSign()
-	if NeonOptions == nil then
-		TellUser("Didn't find settings. Setting them up...", true);
-		NeonOptions = {};
-	end
-	
-	for key, value in pairs(DefaultSettings) do
-		if (NeonOptions[key] == nil) then
-			NeonOptions[key] = value;
-		end
-	end
+	NeonSign:UpdateOptions("NeonOptions", NeonSign.Defaults, false); 
 end
 
 function displayHelp() 
 	TellUser("- Usage", true);
+	print("/neon open - Opens the NeonSign GUI.");
 	print("/neon enable - Enables sending of messages to the specified channel.");
 	print("/neon disable - Disables sending of messages to the specified channel.");
 	print("/neon sendnow - Sends the recruitment message instantly. Resets the interval.");
@@ -277,11 +263,8 @@ function SlashCmdList.NEONSIGN(msg, editbox)
 	end
 	
 	if (cmdList[0] == "channel") then
-		id, name = GetChannelName(tonumber(cmdList[1]));
-		NeonOptions["ChannelId"] = id;
-		NeonOptions["ChannelName"] = name;
-		
-		TellUser("Target recruitment channel is now " .. tostring(id) .. " - " .. name, true);
+		channelName = SetPrimaryRecruitmentChannel(cmdList[1]);
+		TellUser("Target recruitment channel is now " .. cmdList[1] .. " - " .. channelName, true);
 		return;
 	end
 	
@@ -299,4 +282,12 @@ function SlashCmdList.NEONSIGN(msg, editbox)
 	end
 	
 	displayHelp();
+end
+
+function SetPrimaryRecruitmentChannel(channelId)
+	id, name = GetChannelName(tonumber(channelId));
+	NeonOptions["ChannelId"] = id;
+	NeonOptions["ChannelName"] = name;
+
+	return name;
 end

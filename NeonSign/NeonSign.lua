@@ -152,6 +152,24 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 			"Girdle of the Crumbling Sanctum"
 		};
 	end
+
+	if (zone == "Antorus, the Burning Throne") then
+		--Antorus BoEs
+		boes = {
+			"Gloves of Abhorrent Strategies",
+			"Cuffs of the Viridian Flameweavers",
+			"Corrupted Mantle of the Felseekers",
+			"Leggings of the Sable Stalkers",
+			"Sinuous Kerapteron Bindings",
+			"Felflame Inferno Shoulderpads",
+			"Horror Fiend-Scale Breastplate",
+			"Wristguards of Ominous Forging",
+			"Greaves of the Felblade Defenders",
+			"Impenetrable Garothi Breastplate",
+			"Wristguards of the Dark Keepers",
+			"Hulking Demolisher Legplates"
+		};
+	end
 	
 	for i, boe in ipairs(boes) do
 		if string.match(message, escapeLuaPattern(boe)) then

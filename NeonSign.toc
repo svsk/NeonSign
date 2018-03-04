@@ -1,7 +1,7 @@
-## Interface: 70250
+## Interface: 70350
 ## Title: NeonSign
 ## Author: Veinlash @ Karazhan-EU
-## Version: 70251
+## Version: 70350
 ## SavedVariables: NeonOptions
 
 

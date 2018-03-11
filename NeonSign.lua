@@ -88,7 +88,7 @@ end
 local function NeonSignOnChatMessageReceived(self, event, message, sender, language, channel)
 	msg = message:lower();
 	
-	if (msg:match("neon") and msg:match("guild") and msg:match("com")) then		
+	if (msg:match("neon.gg") or msg:match("neon-guild.com")) then		
 		if (PlayerName == sender) then
 			return;
 		end

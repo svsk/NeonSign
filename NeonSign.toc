@@ -1,7 +1,7 @@
-## Interface: 80100
+## Interface: 80000
 ## Title: NeonSign
 ## Author: Veinlash @ Karazhan-EU
-## Version: 80100
+## Version: 80000
 ## SavedVariables: NeonOptions
 
 

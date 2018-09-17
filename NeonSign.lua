@@ -170,6 +170,20 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 			"Hulking Demolisher Legplates"
 		};
 	end
+
+	if (zone == "Uldir") then
+		--Uldir BoEs
+		boes = {
+			"Bloody Experimenter's Wraps",
+			"Spellbound Specimen Handlers",
+			"Splatterguards",
+			"Antiseptic Specimen Handlers",
+			"Reinforced Test Subject Shackles",
+			"Iron-Grip Specimen Handlers",
+			"Crushproof Vambraces",
+			"Fluid-Resistant Specimen Handlers"
+		};
+	end
 	
 	for i, boe in ipairs(boes) do
 		if string.match(message, escapeLuaPattern(boe)) then

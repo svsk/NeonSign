@@ -193,8 +193,8 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 	
 	channel = "RAID_WARNING";
 
-	local officers = GetOfficers();
 	if (boeLooted ~= "None") then
+		local officers = GetOfficers();
 		SendChatMessage("[NeonSign] " .. target .. " looted a BoE item: " .. boeLooted .. ". Please trade it to an officer (".. table.concat(officers, ", ") ..")." , channel, nil, nil);
 	end	
 end

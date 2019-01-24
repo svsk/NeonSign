@@ -184,6 +184,21 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 			"Fluid-Resistant Specimen Handlers"
 		};
 	end
+
+	if (zone == "Battle of Dazar'alor") then
+		--Dazar'alor BoEs
+		boes = {
+			"Slippers of the Encroaching Tide",
+			"Warbeast Hide Cinch",
+			"Silent Pillager's Footpads",
+			"Waistguard of Elemental Resistance",
+			"City Crusher Sabatons",
+			"Boots of the Dark Iron Raider",
+			"Last Stand Greatbelt",
+			"Cord of Zandalari Resolve",
+			"Drape of Valiant Defense"
+		};
+	end
 	
 	for i, boe in ipairs(boes) do
 		if string.match(message, escapeLuaPattern(boe)) then

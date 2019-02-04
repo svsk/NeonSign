@@ -2,7 +2,7 @@ local addonName, NeonSign = ...
 
 -- Globals --
 TimeSinceLast = 0;
-PlayerName = GetUnitName("player") .. "-" .. GetRealmName();
+local PlayerName = GetUnitName("player") .. "-" .. GetRealmName();
 SLASH_NEONSIGN1 = '/neon'; 
 IsGuildGroup = nil;
 

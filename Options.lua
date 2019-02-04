@@ -78,4 +78,5 @@ primaryRecruitmentChannelNameLabel:SetJustifyH("LEFT");
 primaryRecruitmentChannelNameLabel.Refresh = function ()
 	NeonSign.OptionsPanel.primaryRecruitmentChannelNameLabel:SetText(" - " .. NeonOptions["ChannelName"]);
 end
+
 NeonSign:RegisterControl(primaryRecruitmentChannelNameLabel, optionsPanel)

@@ -5,6 +5,6 @@
 ## SavedVariables: NeonOptions
 
 
-NeonSign.lua
 OptionsLib.lua
 Options.lua
+NeonSign.lua

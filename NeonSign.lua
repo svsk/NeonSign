@@ -6,8 +6,46 @@ PlayerName = GetUnitName("player") .. "-" .. GetRealmName();
 SLASH_NEONSIGN1 = '/neon'; 
 IsGuildGroup = nil;
 
+-- Frames --
+local NeonSignFrame = CreateFrame("FRAME", "NeonSignFrame");
+local NeonSignEventListener = CreateFrame("FRAME", "NeonSignEventListener");
+
+-- Set up event handlers
+NeonSignEventListener:SetScript("OnEvent", HandleEvent);
+NeonSignEventListener:RegisterEvent("ADDON_LOADED");
+NeonSignEventListener:RegisterEvent("CHAT_MSG_CHANNEL");
+NeonSignEventListener:RegisterEvent("CHAT_MSG_LOOT");
+NeonSignEventListener:RegisterEvent("GUILD_PARTY_STATE_UPDATED");
+NeonSignFrame:SetScript("OnUpdate", NeonSignOnUpdate);
+
+
 function InitializeNeonSign()
 	NeonSign:UpdateOptions("NeonOptions", NeonSign.Defaults, false); 
+end
+
+function HandleEvent(self, event, addonName, arg2, arg3, arg4, arg5, ...)
+	if event == "ADDON_LOADED" and addonName == "NeonSign" then 
+		TellUser("Addon loaded");
+		InitializeNeonSign();
+	elseif event == "CHAT_MSG_CHANNEL" then
+		TellUser("ChatMsgChannel");
+		NeonSignOnChatMessageReceived(self, event, addonName, arg2, arg3, arg4);
+	elseif event == "CHAT_MSG_LOOT" then
+		TellUser("ChatMsgLoot");
+		NeonSignItemLooted(self, event, addonName, arg2, arg3, arg4, arg5);
+	elseif event == "GUILD_PARTY_STATE_UPDATED" then
+		TellUser("GuildPartyStateChange");
+		NeonSignGroupStateChanged(self, event, addonName);		
+	end
+end
+
+local function NeonSignOnUpdate(self, elapsed, ...)
+	TimeSinceLast = TimeSinceLast + elapsed;
+	
+	if (TimeSinceLast > NeonOptions["RunInterval"]) then 
+		TimeSinceLast = 0 - math.random(1, 20);
+		SendMessageToChat(NeonOptions["RecruitmentMessage"]);
+	end
 end
 
 function displayHelp() 
@@ -73,15 +111,6 @@ function SendMessageToChat(message)
 		SendChatMessage(message, "CHANNEL", nil, id);
 	else
 		TellUser("Unable to find target chat channel. Message not sent.", true);
-	end
-end
-
-local function NeonSignOnUpdate(self, elapsed, ...)
-	TimeSinceLast = TimeSinceLast + elapsed;
-	
-	if (TimeSinceLast > NeonOptions["RunInterval"]) then 
-		TimeSinceLast = 0 - math.random(1, 20);
-		SendMessageToChat(NeonOptions["RecruitmentMessage"]);
 	end
 end
 
@@ -233,31 +262,6 @@ function GetOfficers()
 
 	return officers;
 end
-
-function HandleEvent(self, event, arg1, arg2, arg3, arg4, arg5, ...)
-	if event == "ADDON_LOADED" and arg1 == "NeonSign" then 
-		InitializeNeonSign();
-	elseif event == "CHAT_MSG_CHANNEL" then
-		NeonSignOnChatMessageReceived(self, event, arg1, arg2, arg3, arg4);
-	elseif event == "CHAT_MSG_LOOT" then
-		NeonSignItemLooted(self, event, arg1, arg2, arg3, arg4, arg5);
-	elseif event == "GUILD_PARTY_STATE_UPDATED" then
-		NeonSignGroupStateChanged(self, event, arg1);		
-	end
-end
-
--- Frames --
-local NeonSignFrame = CreateFrame("FRAME", "NeonSignFrame");
-local NeonSignEventListener = CreateFrame("FRAME", "NeonSignEventListener");
-
--- Set up event handlers
-NeonSignEventListener:SetScript("OnEvent", HandleEvent);
-NeonSignEventListener:RegisterEvent("ADDON_LOADED");
-NeonSignEventListener:RegisterEvent("CHAT_MSG_CHANNEL");
-NeonSignEventListener:RegisterEvent("CHAT_MSG_LOOT");
-NeonSignEventListener:RegisterEvent("GUILD_PARTY_STATE_UPDATED");
-NeonSignFrame:SetScript("OnUpdate", NeonSignOnUpdate);
-
 
 -- Slash command stuff --
 function SlashCmdList.NEONSIGN(msg, editbox)

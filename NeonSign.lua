@@ -6,38 +6,11 @@ local PlayerName = GetUnitName("player") .. "-" .. GetRealmName();
 SLASH_NEONSIGN1 = '/neon'; 
 IsGuildGroup = nil;
 
--- Frames --
-local NeonSignFrame = CreateFrame("FRAME", "NeonSignFrame");
-local NeonSignEventListener = CreateFrame("FRAME", "NeonSignEventListener");
-
--- Set up event handlers
-NeonSignEventListener:SetScript("OnEvent", HandleEvent);
-NeonSignEventListener:RegisterEvent("ADDON_LOADED");
-NeonSignEventListener:RegisterEvent("CHAT_MSG_CHANNEL");
-NeonSignEventListener:RegisterEvent("CHAT_MSG_LOOT");
-NeonSignEventListener:RegisterEvent("GUILD_PARTY_STATE_UPDATED");
-NeonSignFrame:SetScript("OnUpdate", NeonSignOnUpdate);
-
 
 function InitializeNeonSign()
 	NeonSign:UpdateOptions("NeonOptions", NeonSign.Defaults, false); 
 end
 
-function HandleEvent(self, event, addonName, arg2, arg3, arg4, arg5, ...)
-	if event == "ADDON_LOADED" and addonName == "NeonSign" then 
-		TellUser("Addon loaded");
-		InitializeNeonSign();
-	elseif event == "CHAT_MSG_CHANNEL" then
-		TellUser("ChatMsgChannel");
-		NeonSignOnChatMessageReceived(self, event, addonName, arg2, arg3, arg4);
-	elseif event == "CHAT_MSG_LOOT" then
-		TellUser("ChatMsgLoot");
-		NeonSignItemLooted(self, event, addonName, arg2, arg3, arg4, arg5);
-	elseif event == "GUILD_PARTY_STATE_UPDATED" then
-		TellUser("GuildPartyStateChange");
-		NeonSignGroupStateChanged(self, event, addonName);		
-	end
-end
 
 local function NeonSignOnUpdate(self, elapsed, ...)
 	TimeSinceLast = TimeSinceLast + elapsed;
@@ -342,3 +315,34 @@ function SetPrimaryRecruitmentChannel(channelId)
 
 	return name;
 end
+
+-------- EVENTS --------
+
+function HandleEvent(self, event, addonName, arg2, arg3, arg4, arg5, ...)
+	if event == "ADDON_LOADED" and addonName == "NeonSign" then 
+		TellUser("Addon loaded");
+		InitializeNeonSign();
+	elseif event == "CHAT_MSG_CHANNEL" then
+		TellUser("ChatMsgChannel");
+		NeonSignOnChatMessageReceived(self, event, addonName, arg2, arg3, arg4);
+	elseif event == "CHAT_MSG_LOOT" then
+		TellUser("ChatMsgLoot");
+		NeonSignItemLooted(self, event, addonName, arg2, arg3, arg4, arg5);
+	elseif event == "GUILD_PARTY_STATE_UPDATED" then
+		TellUser("GuildPartyStateChange");
+		NeonSignGroupStateChanged(self, event, addonName);		
+	end
+end
+
+
+-- Frames --
+local NeonSignFrame = CreateFrame("FRAME", "NeonSignFrame");
+local NeonSignEventListener = CreateFrame("FRAME", "NeonSignEventListener");
+
+-- Set up event handlers
+NeonSignEventListener:SetScript("OnEvent", HandleEvent);
+NeonSignEventListener:RegisterEvent("ADDON_LOADED");
+NeonSignEventListener:RegisterEvent("CHAT_MSG_CHANNEL");
+NeonSignEventListener:RegisterEvent("CHAT_MSG_LOOT");
+NeonSignEventListener:RegisterEvent("GUILD_PARTY_STATE_UPDATED");
+NeonSignFrame:SetScript("OnUpdate", NeonSignOnUpdate);

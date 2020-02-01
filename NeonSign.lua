@@ -201,6 +201,21 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 			"Drape of Valiant Defense"
 		};
 	end
+
+	if (zone == "The Eternal Palace") then
+		--Eternal Palace BoEs
+		boes = {
+			"Handwraps of Unhindered Resonance",
+			"Cuffs of Soothing Currents",
+			"Brineweaver Guardian's Gloves",
+			"Skulker's Blackwater Bands",
+			"Deepcrawler's Handguards",
+			"Abyssal Bubbler's Bracers",
+			"Gauntlets of Crashing Tides",
+			"Brutish Myrmidon's Vambraces",
+			"Cloak of Blessed Depths"
+		};
+	end
 	
 	for i, boe in ipairs(boes) do
 		if string.match(message, escapeLuaPattern(boe)) then

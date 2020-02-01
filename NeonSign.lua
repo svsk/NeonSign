@@ -17,7 +17,7 @@ local function NeonSignOnUpdate(self, elapsed, ...)
 	
 	if (TimeSinceLast > NeonOptions["RunInterval"]) then 
 		TimeSinceLast = 0 - math.random(1, 20);
-		SendMessageToChat(NeonOptions["RecruitmentMessage"]);
+		SendRecruitmentMessage(NeonOptions["RecruitmentMessage"]);
 	end
 end
 
@@ -74,10 +74,13 @@ function TellUser(message, override)
 	end
 end
 
-function SendMessageToChat(message)
+function SendRecruitmentMessage(message)
 	if (NeonOptions["RecruitmentEnabled"] == false) then
 		return;
 	end
+
+	TellUser("An attempt was made to send recruitment message. Recruitment functionality is temporarily unavailable due to changes in the addon API.");
+	return;
 	
 	id, name = GetChannelName(NeonOptions["ChannelId"]);
 	if (id > 0 and name == NeonOptions["ChannelName"]) then
@@ -216,6 +219,19 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 			"Cloak of Blessed Depths"
 		};
 	end
+
+	if (zone == "Ny'alotha, the Waking City") then
+		-- Ny'alotha BoEs
+		boes = {
+			"Lurking Schemer's Band",
+			"Zealous Ritualist's Reverie",
+			"Footpads of Terrible Delusions",
+			"Gauntlets of Nightmare Manifest",
+			"Maddened Adherent's Bulwark",
+			"Belt of Concealed Intent",
+			"Legwraps of Horrifying Figments"
+		};
+	end
 	
 	for i, boe in ipairs(boes) do
 		if string.match(message, escapeLuaPattern(boe)) then
@@ -284,7 +300,7 @@ function SlashCmdList.NEONSIGN(msg, editbox)
 	if (cmdList[0] == "sendnow") then 
 		preState = NeonOptions["RecruitmentEnabled"];
 		NeonOptions["RecruitmentEnabled"] = true;
-		SendMessageToChat(NeonOptions["RecruitmentMessage"]);
+		SendRecruitmentMessage(NeonOptions["RecruitmentMessage"]);
 		TimeSinceLast = 0;
 		NeonOptions["RecruitmentEnabled"] = preState;
 		

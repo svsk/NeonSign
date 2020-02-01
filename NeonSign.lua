@@ -81,13 +81,13 @@ function SendRecruitmentMessage(message)
 
 	TellUser("An attempt was made to send recruitment message. Recruitment functionality is temporarily unavailable due to changes in the addon API.");
 	return;
-	
-	id, name = GetChannelName(NeonOptions["ChannelId"]);
-	if (id > 0 and name == NeonOptions["ChannelName"]) then
-		SendChatMessage(message, "CHANNEL", nil, id);
-	else
-		TellUser("Unable to find target chat channel. Message not sent.", true);
-	end
+
+	--id, name = GetChannelName(NeonOptions["ChannelId"]);
+	--if (id > 0 and name == NeonOptions["ChannelName"]) then
+		--SendChatMessage(message, "CHANNEL", nil, id);
+	--else
+		--TellUser("Unable to find target chat channel. Message not sent.", true);
+	--end
 end
 
 local function NeonSignOnChatMessageReceived(self, event, message, sender, language, channel)

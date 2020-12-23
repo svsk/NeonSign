@@ -1,7 +1,7 @@
-## Interface: 80300
+## Interface: 90002
 ## Title: NeonSign
 ## Author: Veinlash @ Karazhan-EU
-## Version: 80300
+## Version: 90002
 ## SavedVariables: NeonOptions
 
 NeonSign.lua

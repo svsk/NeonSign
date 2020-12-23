@@ -232,6 +232,22 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 			"Legwraps of Horrifying Figments"
 		};
 	end
+
+	if (zone == "Castle Nathria") then
+		-- Castle Nathria BoEs
+		boes = {
+			"Ardent Sunstar Signet",
+			"Sylvan Whiteshield",
+			"Supple Supplicant's Gloves",
+			"Acolyte's Velvet Bindings",
+			"Stud-Scarred Footwear",
+			"Barkweave Wristwraps",
+			"Legionnaire's Bloodstained Sabatons",
+			"Watchful Arbelist's Bracers",
+			"Fallen Templar's Gauntlets",
+			"Soldier's Stoneband Wristguards"
+		};
+	end
 	
 	for i, boe in ipairs(boes) do
 		if string.match(message, escapeLuaPattern(boe)) then

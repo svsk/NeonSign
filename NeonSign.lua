@@ -245,7 +245,8 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 			"Legionnaire's Bloodstained Sabatons",
 			"Watchful Arbelist's Bracers",
 			"Fallen Templar's Gauntlets",
-			"Soldier's Stoneband Wristguards"
+			"Soldier's Stoneband Wristguards",
+			"Decadent Nathrian Shawl"
 		};
 	end
 	

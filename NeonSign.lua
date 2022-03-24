@@ -3,25 +3,25 @@ local addonName, NeonSign = ...
 -- Globals --
 TimeSinceLast = 0;
 local PlayerName = GetUnitName("player") .. "-" .. GetRealmName();
-SLASH_NEONSIGN1 = '/neon'; 
+SLASH_NEONSIGN1 = '/neon';
 IsGuildGroup = nil;
 
 
 function InitializeNeonSign()
-	NeonSign:UpdateOptions("NeonOptions", NeonSign.Defaults, false); 
+	NeonSign:UpdateOptions("NeonOptions", NeonSign.Defaults, false);
 end
 
 
 local function NeonSignOnUpdate(self, elapsed, ...)
 	TimeSinceLast = TimeSinceLast + elapsed;
-	
-	if (TimeSinceLast > NeonOptions["RunInterval"]) then 
+
+	if (TimeSinceLast > NeonOptions["RunInterval"]) then
 		TimeSinceLast = 0 - math.random(1, 20);
 		SendRecruitmentMessage(NeonOptions["RecruitmentMessage"]);
 	end
 end
 
-function displayHelp() 
+function displayHelp()
 	TellUser("- Usage", true);
 	print("/neon open - Opens the NeonSign GUI.");
 	print("/neon enable - Enables sending of messages to the specified channel.");
@@ -37,11 +37,11 @@ function splitString(srcString)
 	words = {};
 	index = 0;
 
-	for word in srcString:lower():gmatch("%w+") do 
+	for word in srcString:lower():gmatch("%w+") do
 		words[index] = word;
 		index = index + 1;
 	end
-	
+
 	return words;
 end
 
@@ -92,12 +92,12 @@ end
 
 local function NeonSignOnChatMessageReceived(self, event, message, sender, language, channel)
 	msg = message:lower();
-	
-	if (msg:match("neon.gg") or msg:match("neon-guild.com")) then		
+
+	if (msg:match("neon.gg") or msg:match("neon-guild.com")) then
 		if (PlayerName == sender) then
 			return;
 		end
-	
+
 		TellUser("Looks like someone else is spamming the chat. Resetting the timer.");
 		TimeSinceLast = 0 - math.random(1, 20);
 	end
@@ -114,19 +114,19 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 
 	if (zone == "Hellfire Citadel") then
 		--Hellfire BoEs
-		boes = { 
-			"Unhallowed Voidlink Boots", 
-			"Girdle of Demonic Wrath", 
-			"Cruel Hope Crushers", 
-			"Cord of Unhinged Malice", 
-			"Cursed Demonchain Belt", 
-			"Flayed Demonskin Belt", 
+		boes = {
+			"Unhallowed Voidlink Boots",
+			"Girdle of Demonic Wrath",
+			"Cruel Hope Crushers",
+			"Cord of Unhinged Malice",
+			"Cursed Demonchain Belt",
+			"Flayed Demonskin Belt",
 			"Dessicated Soulrender Slippers",
 			"Jungle Assassin's Footpads"
 		};
 	end
 
-	if (zone == "The Nighthold") then 
+	if (zone == "The Nighthold") then
 		--Nighthold BoEs
 		boes = {
 			"Aristocrat's Winter Drape",
@@ -249,19 +249,47 @@ local function NeonSignItemLooted(self, event, message, sender, language, channe
 			"Decadent Nathrian Shawl"
 		};
 	end
-	
+
+	if (zone == "Sanctum of Domination") then
+		-- Sanctum of Domination BoEs
+		boes = {
+			"Forlorn Prisoner's Strap",
+			"Soulcaster's Woven Grips",
+			"Bindings of the Subjugated",
+			"Scoundrel's Harrowed Leggings",
+			"Bonded Soulsmelt Greaves",
+			"Cord of Coerced Spirits",
+			"Towering Shadowghast Greatboots",
+			"Ancient Brokensoul Bands"
+		};
+	end
+
+	if (zone == "Sepulcher of the First Ones") then
+		-- Sepulcher BoEs
+		boes = {
+			"Devouring Pellicle Shoulderpads",
+			"Vandalized Ephemera Mitts",
+			"Subversive Lord's Leggings",
+			"Hood of Empty Eternities",
+			"Cartel's Larcenous Toecaps",
+			"Lupine's Synthetic Headgear",
+			"Pauldrons of Possible Afterlives",
+			"Gauntlets of the End",
+		};
+	end
+
 	for i, boe in ipairs(boes) do
 		if string.match(message, escapeLuaPattern(boe)) then
 			boeLooted = boe;
 		end
 	end
-	
+
 	channel = "RAID_WARNING";
 
 	if (boeLooted ~= "None") then
 		local officers = GetOfficers();
 		SendChatMessage("[NeonSign] " .. target .. " looted a BoE item: " .. boeLooted .. ". Please trade it to an officer (".. table.concat(officers, ", ") ..")." , channel, nil, nil);
-	end	
+	end
 end
 
 local function NeonSignGroupStateChanged(self, event, isGuildGroup)
@@ -286,73 +314,73 @@ end
 
 -- Slash command stuff --
 function SlashCmdList.NEONSIGN(msg, editbox)
-	cmdList = splitString(msg);	
+	cmdList = splitString(msg);
 
 	if (cmdList[0] == "interval") then
 		if (cmdList[1] ~= nil and tonumber(cmdList[1]) ~= nil) then
 			NeonOptions["RunInterval"] = tonumber(cmdList[1]);
 		end
-	
+
 		TellUser("The current interval is " .. NeonOptions["RunInterval"] .. " seconds.", true);
 		TellUser("A new message will be sent in " .. math.floor(NeonOptions["RunInterval"] - TimeSinceLast) .. " seconds.", true);
-		
+
 		return;
 	end
-	
+
 	if (cmdList[0] == "enable") then
 		TimeSinceLast = 0;
 		NeonOptions["RecruitmentEnabled"] = true;
 		TellUser("Addon enabled. Will send recruitment message in " .. NeonOptions["RunInterval"] .. " seconds.", true);
-		
+
 		return;
 	end
-	
+
 	if (cmdList[0] == "disable") then
 		NeonOptions["RecruitmentEnabled"] = false;
 		TellUser("Addon disabled.", true);
-		
+
 		return;
 	end
-	
-	if (cmdList[0] == "sendnow") then 
+
+	if (cmdList[0] == "sendnow") then
 		preState = NeonOptions["RecruitmentEnabled"];
 		NeonOptions["RecruitmentEnabled"] = true;
 		SendRecruitmentMessage(NeonOptions["RecruitmentMessage"]);
 		TimeSinceLast = 0;
 		NeonOptions["RecruitmentEnabled"] = preState;
-		
+
 		return;
 	end
-	
+
 	if (cmdList[0] == "isguildgroup") then
 		if (IsGuildGroup ~= nil) then
 			TellUser("IsGuildGroup = " .. tostring(IsGuildGroup) .. " (Debug)", true);
 		else
 			TellUser("IsGuildGroup = nil (Debug)", true);
 		end
-		
+
 		return;
 	end
-	
+
 	if (cmdList[0] == "channel") then
 		channelName = SetPrimaryRecruitmentChannel(cmdList[1]);
 		TellUser("Target recruitment channel is now " .. cmdList[1] .. " - " .. channelName, true);
 		return;
 	end
-	
+
 	if (cmdList[0] == "debug") then
 		NeonOptions["ShowDebugMessages"] = not NeonOptions["ShowDebugMessages"];
 		TellUser("Debug mode: " .. tostring(NeonOptions["ShowDebugMessages"]), true);
 		return;
 	end
-	
+
 	if (cmdList[0] == "m") then
 		local message = msg:gsub("^m ", "");
 		NeonOptions["RecruitmentMessage"] = message;
 		TellUser("Recruitment message updated!", true);
 		return;
 	end
-	
+
 	displayHelp();
 end
 
@@ -367,7 +395,7 @@ end
 -------- EVENTS --------
 
 function HandleEvent(self, event, addonName, arg2, arg3, arg4, arg5, ...)
-	if event == "ADDON_LOADED" and addonName == "NeonSign" then 
+	if event == "ADDON_LOADED" and addonName == "NeonSign" then
 		TellUser("Addon loaded");
 		InitializeNeonSign();
 	elseif event == "CHAT_MSG_CHANNEL" then
@@ -378,7 +406,7 @@ function HandleEvent(self, event, addonName, arg2, arg3, arg4, arg5, ...)
 		NeonSignItemLooted(self, event, addonName, arg2, arg3, arg4, arg5);
 	elseif event == "GUILD_PARTY_STATE_UPDATED" then
 		TellUser("GuildPartyStateChange");
-		NeonSignGroupStateChanged(self, event, addonName);		
+		NeonSignGroupStateChanged(self, event, addonName);
 	end
 end
 
